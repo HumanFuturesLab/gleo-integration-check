@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Integration Tester</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container-fluid py-3">
+        <div class="row g-3">
+            <!-- Left column - Input form -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow fade-in">
+                    <div class="card-header compact-header">
+                        <h4 class="mb-0">Shopify Integration Tester</h4>
+                        <p class="mb-0 small">Test your Shopify store integration</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="integration-form">
+                            <div class="mb-3">
+                                <label for="shop-url" class="form-label compact-label">Shop URL</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                    <input type="text" class="form-control" id="shop-url" placeholder="mystore.com" autocomplete="off" autofocus>
+                                    <div class="input-group-validation">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                </div>
+                                <div class="form-text compact-text">Without http/https</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="access-token" class="form-label compact-label">Access Token</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                    <input type="password" class="form-control" id="access-token" placeholder="shpat_..." autocomplete="off">
+                                    <div class="input-group-validation">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                    <button class="btn btn-outline-secondary btn-sm" type="button" id="toggle-token" aria-label="Toggle password visibility">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text compact-text">Starts with shpat_</div>
+                            </div>
+                            <div class="d-grid mt-3">
+                                <button type="submit" class="btn btn-primary btn-sm" id="test-button">
+                                    <span id="btn-text">Test Integration</span>
+                                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right column - Results -->
+            <div class="col-md-8 col-lg-9">
+                <div id="results-card" class="card shadow fade-in h-100">
+                    <div class="card-header compact-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Test Results</h4>
+                        <button id="back-button" class="btn btn-sm btn-outline-light" style="display: none;">
+                            <i class="bi bi-arrow-left me-1"></i>Return
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="results-loading" class="text-center py-5">
+                            <div class="spinner-border text-primary pulse" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3">Testing integration, please wait...</p>
+                        </div>
+                        
+                        <div id="results-content" class="d-none">
+                            <!-- Overall Status -->
+                            <div id="overall-status" class="p-3 border-bottom"></div>
+                            
+                            <!-- Results grid -->
+                            <div class="row g-0">
+                                <!-- Left column results -->
+                                <div class="col-md-6 border-end">
+                                    <!-- Connection Section -->
+                                    <div class="p-3 border-bottom">
+                                        <h6 class="section-heading-sm">Connection</h6>
+                                        <div id="connection-status">
+                                            <div class="results-empty-state compact">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                                <p>Loading connection results...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Permissions Section -->
+                                    <div class="p-3 border-bottom">
+                                        <h6 class="section-heading-sm">Permissions</h6>
+                                        <div id="permissions-status">
+                                            <div class="results-empty-state compact">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                                <p>Loading permissions results...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right column results -->
+                                <div class="col-md-6">
+                                    <!-- Operations Section -->
+                                    <div class="p-3 border-bottom">
+                                        <h6 class="section-heading-sm">Operations</h6>
+                                        <div id="operations-status">
+                                            <div class="results-empty-state compact">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                                <p>Loading operations results...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Final Result & Recommended Domain -->
+                                    <div class="p-3">
+                                        <div class="mb-3">
+                                            <h6 class="section-heading-sm">Final Result</h6>
+                                            <div id="final-result">
+                                                <div class="results-empty-state compact">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                    <p>Loading final result...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h6 class="section-heading-sm">Recommended Domain</h6>
+                                            <div id="recommended-domain" class="alert alert-info py-2 px-3 mb-0">
+                                                <div class="results-empty-state compact">
+                                                    <p>Loading recommended domain...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Errors Section (Collapsed by default) -->
+                            <div id="errors-section" class="p-3 border-top d-none">
+                                <h6 class="section-heading-sm">Errors</h6>
+                                <div class="alert alert-danger py-2 px-3 mb-0">
+                                    <ul id="errors-list" class="mb-0 ps-3"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer compact-footer text-center">
+                        <small class="text-muted">© 2023 GLEO Shopify Integration Tester</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html> 

@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gleo-Shopify Integration</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #f5f5ff;
+            --success-color: #22c55e;
+            --success-bg: #f0fdf4;
+            --error-color: #ef4444;
+            --error-bg: #fef2f2;
+            --border-color: #e5e7eb;
+            --text-color: #374151;
+            --text-muted: #6b7280;
+            --bg-color: #ffffff;
+            --card-bg: #f9fafb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: var(--text-color);
+            background-color: #f3f4f6;
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .left-panel {
+            width: 350px;
+            background-color: var(--bg-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--bg-color);
+            margin-left: 20px;
+        }
+
+        .header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .header-small {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .input-group input {
+            padding-left: 36px;
+            width: 100%;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #4338ca;
+        }
+
+        .button-secondary {
+            background-color: #f9fafb;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .button-secondary:hover {
+            background-color: #f3f4f6;
+        }
+
+        .section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .status-item {
+            display: flex;
+            padding: 12px;
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .status-icon {
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .status-content {
+            flex: 1;
+        }
+
+        .status-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .status-description {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .success-status {
+            background-color: var(--success-bg);
+            border-color: #86efac;
+        }
+
+        .success-status .status-icon {
+            color: var(--success-color);
+        }
+
+        .error-status {
+            background-color: var(--error-bg);
+            border-color: #fecaca;
+        }
+
+        .error-status .status-icon {
+            color: var(--error-color);
+        }
+
+        .result-summary {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .success-result {
+            background-color: var(--success-bg);
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+
+        .error-result {
+            background-color: var(--error-bg);
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .result-icon {
+            margin-right: 12px;
+        }
+
+        .domain-recommendation {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .domain-value {
+            font-family: monospace;
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .troubleshooting {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .troubleshooting ul {
+            margin-top: 8px;
+            padding-left: 24px;
+        }
+
+        .troubleshooting li {
+            margin-bottom: 8px;
+        }
+
+        .tab-container {
+            margin-top: 24px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .tab-button {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: auto;
+            transition: all 0.2s;
+        }
+
+        .tab-button:hover {
+            background: none;
+            color: var(--text-color);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .details-table th, .details-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .details-table th {
+            font-weight: 500;
+            color: var(--text-muted);
+            width: 35%;
+        }
+
+        pre.raw-data {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 0;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 16px;
+            border: 3px solid rgba(79, 70, 229, 0.2);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spinner 0.8s linear infinite;
+        }
+
+        @keyframes spinner {
+            to {transform: rotate(360deg);}
+        }
+
+        /* Hidden by default */
+        #details-container, #troubleshooting-container, #result {
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .return-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .return-link svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="header">
+                <h1>Gleo-Shopify Integration</h1>
+                <div class="header-small">Test your Shopify store integration</div>
+            </div>
+
+            <div class="form-group">
+                <label for="store_url">Shop URL</label>
+                <div class="input-group">
+                    <div class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="store_url" placeholder="mystore.myshopify.com">
+                </div>
+                <div class="note">Without http/https</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="access_token">Access Token</label>
+                <div class="input-group">
+                    <div class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <input type="password" id="access_token" placeholder="shpat_...">
+                </div>
+                <div class="note">Starts with shpat_</div>
+            </div>
+            
+            <button onclick="checkIntegration()">Test Integration</button>
+        </div>
+        
+        <div class="right-panel">
+            <a href="#" class="return-link hidden" id="return-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Return
+            </a>
+            
+            <div class="header">
+                <h1>Test Results</h1>
+            </div>
+            
+            <div id="loading">
+                <div class="spinner"></div>
+                <p>Testing your Shopify integration...</p>
+            </div>
+            
+            <div id="result"></div>
+            
+            <div id="details-container">
+                <div id="sections-container">
+                    <!-- Sections will be populated dynamically -->
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="openTab(event, 'store-tab')">Store Details</button>
+                        <button class="tab-button" onclick="openTab(event, 'connection-tab')">Connection</button>
+                        <button class="tab-button" onclick="openTab(event, 'permissions-tab')">Permissions</button>
+                        <button class="tab-button" onclick="openTab(event, 'raw-tab')">Raw Data</button>
+                    </div>
+                    
+                    <div id="store-tab" class="tab-content active">
+                        <table class="details-table" id="details-table">
+                            <!-- Table will be populated dynamically -->
+                        </table>
+                    </div>
+                    
+                    <div id="connection-tab" class="tab-content">
+                        <div id="connection-details">
+                            <!-- Connection details will be populated dynamically -->
+                        </div>
+                        
+                        <div class="section">
+                            <div class="section-title">Domains Tried</div>
+                            <div id="domains-tried-list">
+                                <!-- Domains tried will be populated dynamically -->
+                            </div>
+                        </div>
+                        
+                        <div id="recommended-domains-container" class="domain-recommendation hidden">
+                            <h3>Recommended Domain</h3>
+                            <div id="recommended-domains-list">
+                                <!-- Recommended domains will be populated dynamically -->
+                            </div>
+                            <p class="note">This is the recommended domain format to use when configuring your integration.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="permissions-tab" class="tab-content">
+                        <div id="permissions-container">
+                            <!-- Permissions will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div id="raw-tab" class="tab-content">
+                        <pre class="raw-data" id="raw-data">
+                            <!-- Raw data will be populated dynamically -->
+                        </pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="troubleshooting-container" class="troubleshooting">
+                <h3>Troubleshooting</h3>
+                <ul id="troubleshooting-list">
+                    <!-- Troubleshooting tips will be populated dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function checkIntegration() {
+        const store_url = document.getElementById('store_url').value;
+        const access_token = document.getElementById('access_token').value;
+        const resultDiv = document.getElementById('result');
+        const detailsContainer = document.getElementById('details-container');
+        const sectionsContainer = document.getElementById('sections-container');
+        const detailsTable = document.getElementById('details-table');
+        const rawData = document.getElementById('raw-data');
+        const troubleshootingContainer = document.getElementById('troubleshooting-container');
+        const troubleshootingList = document.getElementById('troubleshooting-list');
+        const loadingDiv = document.getElementById('loading');
+        const returnLink = document.getElementById('return-link');
+        
+        // Validate inputs
+        if (!store_url || !access_token) {
+            alert("Please enter both Store URL and Access Token");
+            return;
+        }
+        
+        // Show loading indicator
+        loadingDiv.style.display = 'block';
+        returnLink.classList.remove('hidden');
+        
+        // Clear previous results
+        resultDiv.innerHTML = '';
+        resultDiv.style.display = 'none';
+        detailsContainer.style.display = 'none';
+        troubleshootingContainer.style.display = 'none';
+        sectionsContainer.innerHTML = '';
+        detailsTable.innerHTML = '';
+        rawData.textContent = '';
+        troubleshootingList.innerHTML = '';
+        
+        fetch('/api/check-integration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                store_url: store_url,
+                access_token: access_token
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading
+            loadingDiv.style.display = 'none';
+            
+            // Show result
+            resultDiv.style.display = 'block';
+            
+            if (data.status === 'success') {
+                // Success result
+                resultDiv.innerHTML = `
+                    <div class="result-summary success-result">
+                        <div class="result-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <strong>All tests passed successfully!</strong>
+                            <div>Your Shopify integration is configured correctly and ready to use.</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show details container
+                detailsContainer.style.display = 'block';
+                
+                // Create sections
+                createConnectionSection(data, sectionsContainer);
+                createStoreInfoSection(data, sectionsContainer);
+                createPermissionsSection(data, sectionsContainer);
+                createOperationsSection(data, sectionsContainer);
+                
+                // Populate the details table
+                populateDetailsTable(data.details);
+                
+                // Populate connection details
+                populateConnectionDetails(data.connection);
+                
+                // Populate permissions
+                populatePermissions(data.permissions);
+                
+                // Set the raw data
+                if (data.raw) {
+                    rawData.textContent = JSON.stringify(data.raw, null, 2);
+                }
+                
+                // Add recommended domain if available
+                if (data.connection && data.connection.recommendedDomains && data.connection.recommendedDomains.length > 0) {
+                    const recommendedDomainsContainer = document.getElementById('recommended-domains-container');
+                    recommendedDomainsContainer.classList.remove('hidden');
+                }
+                
+                // Add final result section
+                const finalResult = document.createElement('div');
+                finalResult.className = 'section';
+                finalResult.innerHTML = `
+                    <div class="section-title">Final Result</div>
+                    <div class="status-item success-status">
+                        <div class="status-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="status-content">
+                            <div class="status-title">All tests passed successfully! Your Shopify integration is ready to use.</div>
+                        </div>
+                    </div>
+                `;
+                sectionsContainer.appendChild(finalResult);
+                
+            } else {
+                // Error result
+                resultDiv.innerHTML = `
+                    <div class="result-summary error-result">
+                        <div class="result-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <strong>${data.message || 'Integration check failed'}</strong>
+                            <div>Please check the troubleshooting section for more information.</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show error details and troubleshooting
+                if (data.troubleshooting && data.troubleshooting.length > 0) {
+                    troubleshootingContainer.style.display = 'block';
+                    data.troubleshooting.forEach(tip => {
+                        const li = document.createElement('li');
+                        li.textContent = tip;
+                        troubleshootingList.appendChild(li);
+                    });
+                }
+                
+                // Add connection section
+                if (data.connection) {
+                    detailsContainer.style.display = 'block';
+                    
+                    // Create connection section with error state
+                    const connectionSection = document.createElement('div');
+                    connectionSection.className = 'section';
+                    connectionSection.innerHTML = `
+                        <div class="section-title">Connection</div>
+                        <div class="status-item error-status">
+                            <div class="status-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-title">Connection Failed</div>
+                                <div class="status-description">Could not connect to ${data.connection.selectedDomain || store_url}</div>
+                            </div>
+                        </div>
+                    `;
+                    sectionsContainer.appendChild(connectionSection);
+                    
+                    // Show connection tab
+                    document.getElementById('store-tab').classList.remove('active');
+                    document.getElementById('connection-tab').classList.add('active');
+                    document.querySelector('.tab-button.active').classList.remove('active');
+                    document.querySelectorAll('.tab-button')[1].classList.add('active');
+                    
+                    // Populate connection details
+                    populateConnectionDetails(data.connection);
+                    
+                    // Add recommended domain if available
+                    if (data.connection.recommendedDomains && data.connection.recommendedDomains.length > 0) {
+                        const recommendedDomainsContainer = document.getElementById('recommended-domains-container');
+                        recommendedDomainsContainer.classList.remove('hidden');
+                    }
+                }
+                
+                if (data.details) {
+                    rawData.textContent = JSON.stringify(data.details, null, 2);
+                }
+            }
+        })
+        .catch(error => {
+            loadingDiv.style.display = 'none';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="result-summary error-result">
+                    <div class="result-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    function createConnectionSection(data, container) {
+        const section = document.createElement('div');
+        section.className = 'section';
+        section.innerHTML = `
+            <div class="section-title">Connection</div>
+            <div class="status-item success-status">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Connection</div>
+                    <div class="status-description">Connected to ${data.connection ? data.connection.selectedDomain : (data.details && data.details.domain ? data.details.domain : '')}</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(section);
+    }
+    
+    function createStoreInfoSection(data, container) {
+        if (!data.details) return;
+        
+        const section = document.createElement('div');
+        section.className = 'section';
+        section.innerHTML = `
+            <div class="section-title">Store Information</div>
+            <div class="status-item success-status">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Store Information</div>
+                    <div class="status-description">Store Name: ${data.details.shop || ''}, Plan: ${data.details.plan || ''}</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(section);
+    }
+    
+    function createPermissionsSection(data, container) {
+        if (!data.permissions || data.permissions.length === 0) return;
+        
+        const section = document.createElement('div');
+        section.className = 'section';
+        section.innerHTML = `<div class="section-title">Permissions</div>`;
+        
+        data.permissions.forEach(permission => {
+            const isAvailable = permission.status ? 
+                permission.status.toLowerCase().includes('available') : 
+                (permission.required ? true : false);
+            
+            const item = document.createElement('div');
+            item.className = `status-item ${isAvailable ? 'success-status' : 'error-status'}`;
+            item.innerHTML = `
+                <div class="status-icon">
+                    ${isAvailable ? 
+                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>` :
+                        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>`
+                    }
+                </div>
+                <div class="status-content">
+                    <div class="status-title">${permission.scope}</div>
+                    <div class="status-description">${permission.description}</div>
+                </div>
+            `;
+            section.appendChild(item);
+        });
+        
+        container.appendChild(section);
+    }
+    
+    function createOperationsSection(data, container) {
+        // Mock operations section for now - in real implementation, this would contain
+        // actual API operations that were tested
+        const section = document.createElement('div');
+        section.className = 'section';
+        section.innerHTML = `
+            <div class="section-title">Operations</div>
+            <div class="status-item success-status">
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Shop Access</div>
+                    <div class="status-description">Successfully accessed shop information</div>
+                </div>
+            </div>
+        `;
+        
+        if (data.connection && data.connection.tokenType) {
+            const item = document.createElement('div');
+            item.className = 'status-item success-status';
+            item.innerHTML = `
+                <div class="status-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Token Verification</div>
+                    <div class="status-description">${data.connection.tokenType} verified</div>
+                </div>
+            `;
+            section.appendChild(item);
+        }
+        
+        container.appendChild(section);
+    }
+    
+    function populateDetailsTable(details) {
+        if (!details) return;
+        
+        const detailsTable = document.getElementById('details-table');
+        detailsTable.innerHTML = '';
+        
+        Object.entries(details).forEach(([key, value]) => {
+            const row = document.createElement('tr');
+            
+            const keyCell = document.createElement('th');
+            keyCell.textContent = formatKey(key);
+            row.appendChild(keyCell);
+            
+            const valueCell = document.createElement('td');
+            valueCell.textContent = value;
+            row.appendChild(valueCell);
+            
+            detailsTable.appendChild(row);
+        });
+    }
+    
+    function populateConnectionDetails(connection) {
+        if (!connection) return;
+        
+        const connectionDetails = document.getElementById('connection-details');
+        const domainsList = document.getElementById('domains-tried-list');
+        const recommendedDomainsContainer = document.getElementById('recommended-domains-container');
+        const recommendedDomainsList = document.getElementById('recommended-domains-list');
+        
+        connectionDetails.innerHTML = '';
+        domainsList.innerHTML = '';
+        recommendedDomainsList.innerHTML = '';
+        
+        // Create a table for connection details
+        const table = document.createElement('table');
+        table.className = 'details-table';
+        
+        // Add token type if available
+        if (connection.tokenType) {
+            addTableRow(table, 'Token Type', connection.tokenType);
+        }
+        
+        // Add API version
+        if (connection.apiVersion) {
+            addTableRow(table, 'API Version', connection.apiVersion);
+        }
+        
+        // Add selected domain
+        if (connection.selectedDomain) {
+            addTableRow(table, 'Selected Domain', connection.selectedDomain);
+        }
+        
+        connectionDetails.appendChild(table);
+        
+        // Add domains tried
+        if (connection.domainsTried && connection.domainsTried.length > 0) {
+            connection.domainsTried.forEach(domain => {
+                const item = document.createElement('div');
+                item.className = 'status-item';
+                item.innerHTML = `
+                    <div class="status-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
+                    <div class="status-content">
+                        <div class="status-title">${domain}</div>
+                    </div>
+                `;
+                domainsList.appendChild(item);
+            });
+        }
+        
+        // Add recommended domains
+        if (connection.recommendedDomains && connection.recommendedDomains.length > 0) {
+            recommendedDomainsContainer.classList.remove('hidden');
+            connection.recommendedDomains.forEach(domain => {
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-value';
+                domainElement.textContent = domain;
+                recommendedDomainsList.appendChild(domainElement);
+            });
+        } else {
+            recommendedDomainsContainer.classList.add('hidden');
+        }
+    }
+    
+    function addTableRow(table, label, value) {
+        const row = document.createElement('tr');
+        
+        const labelCell = document.createElement('th');
+        labelCell.textContent = label;
+        row.appendChild(labelCell);
+        
+        const valueCell = document.createElement('td');
+        valueCell.textContent = value;
+        row.appendChild(valueCell);
+        
+        table.appendChild(row);
+    }
+    
+    function populatePermissions(permissions) {
+        if (!permissions || permissions.length === 0) return;
+        
+        const permissionsContainer = document.getElementById('permissions-container');
+        permissionsContainer.innerHTML = '';
+        
+        permissions.forEach(permission => {
+            const permissionDiv = document.createElement('div');
+            permissionDiv.className = 'status-item';
+            
+            // Determine status class
+            let statusClass = '';
+            let statusText = 'Unknown';
+            let iconSvg = '';
+            
+            if (permission.status) {
+                if (permission.status.toLowerCase().includes('available')) {
+                    statusClass = 'success-status';
+                    statusText = permission.status;
+                    iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>`;
+                } else if (permission.status.toLowerCase().includes('unavailable')) {
+                    statusClass = 'error-status';
+                    statusText = permission.status;
+                    iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>`;
+                } else {
+                    statusText = permission.status;
+                    iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>`;
+                }
+            } else if (permission.required) {
+                statusClass = 'success-status';
+                statusText = 'Required';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>`;
+            }
+            
+            permissionDiv.className = `status-item ${statusClass}`;
+            permissionDiv.innerHTML = `
+                <div class="status-icon">
+                    ${iconSvg}
+                </div>
+                <div class="status-content">
+                    <div class="status-title">${permission.scope}</div>
+                    <div class="status-description">${permission.description}</div>
+                </div>
+            `;
+            
+            permissionsContainer.appendChild(permissionDiv);
+        });
+    }
+    
+    function formatKey(key) {
+        // Convert camelCase to Title Case with spaces
+        return key
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase());
+    }
+    
+    function openTab(evt, tabName) {
+        // Get all tab content and hide them
+        const tabContents = document.getElementsByClassName('tab-content');
+        for (let i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove('active');
+        }
+        
+        // Get all tab buttons and remove the active class
+        const tabButtons = document.getElementsByClassName('tab-button');
+        for (let i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].classList.remove('active');
+        }
+        
+        // Show the current tab and add an active class to the button
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+    
+    // Make return link work
+    document.getElementById('return-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        // Reset the UI
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('details-container').style.display = 'none';
+        document.getElementById('troubleshooting-container').style.display = 'none';
+        document.getElementById('loading').style.display = 'none';
+        this.classList.add('hidden');
+    });
+    </script>
+</body>
+</html> 
